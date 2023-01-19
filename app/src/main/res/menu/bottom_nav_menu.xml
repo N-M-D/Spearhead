@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Home"
+        android:icon="@drawable/home_icon"
+        android:id="@+id/homepage"/>
+    <item android:title="Timer"
+        android:icon="@drawable/clock_empty_icon"
+        android:id="@+id/timerpage"/>
+    <item android:title="Music"
+        android:icon="@drawable/music_icon"
+        android:id="@+id/musicpage"/>
+    <item android:title="Profile"
+        android:icon="@drawable/profile_icon"
+        android:id="@+id/profilepage"/>
+</menu>
