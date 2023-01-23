@@ -3,17 +3,26 @@ package com.example.spearhead;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MusicFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MusicFragment extends Fragment {
+public class MusicFragment extends Fragment implements View.OnClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -54,12 +63,31 @@ public class MusicFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         getActivity().setTitle("Music");
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_music, container, false);
+        View view = inflater.inflate(R.layout.fragment_music, container, false);
+        LinearLayout allMusic = (LinearLayout) view.findViewById(R.id.AllMusicButton);
+        LinearLayout playlist = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
+        allMusic.setOnClickListener(this::onClick);
+        List<Music> musicList = new ArrayList<Music>();
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
+        musicList.add(new Music(R.drawable.into_the_night, "Something Else", "YOAsobi"));
+        RecyclerView recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
+        LinearLayoutManager linearLayoutManager = new GridLayoutManager(getActivity(), 2);
+        recyclerList.setLayoutManager(linearLayoutManager);
+        MusicListAdapter musicListAdapter= new MusicListAdapter(musicList);
+        recyclerList.setAdapter(musicListAdapter);
+        return view;
+    }
+
+    @Override
+    public void onClick(View v){
+        Toast.makeText(getContext(), "Test", Toast.LENGTH_LONG).show();
     }
 }
