@@ -13,10 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.MyViewHolder> {
-
+    private final RecyclerViewInterface recyclerViewInterface;
     private List<Music> musicList;
 
-    public MusicListAdapter(List<Music> musicList) {
+    public MusicListAdapter(List<Music> musicList, RecyclerViewInterface recyclerViewInterface) {
+        this.recyclerViewInterface = recyclerViewInterface;
         this.musicList = musicList;
     }
 
@@ -48,6 +49,19 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.MyVi
             super(itemView);
             musicThumbnail = itemView.findViewById(R.id.MusicThumbnail);
             musicTitle = itemView.findViewById(R.id.MusicTitle);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(recyclerViewInterface != null){
+                        int pos = getAdapterPosition();
+
+                        if(pos != RecyclerView.NO_POSITION){
+                            recyclerViewInterface.onItemClick(pos);
+                        }
+                    }
+                }
+            });
         }
     }
 }

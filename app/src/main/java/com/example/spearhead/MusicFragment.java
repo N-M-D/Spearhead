@@ -11,7 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import java.util.List;
  * Use the {@link MusicFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MusicFragment extends Fragment implements View.OnClickListener {
+public class MusicFragment extends Fragment implements View.OnClickListener, RecyclerViewInterface {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,6 +34,9 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    RecyclerView recyclerList;
+    MusicListAdapter musicListAdapter;
+    List<Music> musicList = new ArrayList<>();
 
     public MusicFragment() {
         // Required empty public constructor
@@ -75,13 +80,19 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         LinearLayout allMusic = (LinearLayout) view.findViewById(R.id.AllMusicButton);
         LinearLayout playlist = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
         allMusic.setOnClickListener(this::onClick);
-        List<Music> musicList = new ArrayList<Music>();
         musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
-        musicList.add(new Music(R.drawable.into_the_night, "Something Else", "YOAsobi"));
-        RecyclerView recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
+        recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
         LinearLayoutManager linearLayoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerList.setLayoutManager(linearLayoutManager);
-        MusicListAdapter musicListAdapter= new MusicListAdapter(musicList);
+        musicListAdapter= new MusicListAdapter(musicList, this);
         recyclerList.setAdapter(musicListAdapter);
         return view;
     }
@@ -89,5 +100,20 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v){
         Toast.makeText(getContext(), "Test", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onItemClick(int pos) {
+        changeNowPlaying(musicList.get(pos));
+    }
+
+    void changeNowPlaying(Music music){
+        LinearLayout nowPlayingLayout = (LinearLayout) getView().findViewById(R.id.MusicControl);
+        ImageView nowPlaying = (ImageView) getView().findViewById(R.id.musicControlBg);
+        TextView songTitle = (TextView) getView().findViewById(R.id.currentSongTitle);
+
+        nowPlayingLayout.setBackgroundResource(R.drawable.music_control_gradient);
+        nowPlaying.setImageResource(music.getImg());
+        songTitle.setText(music.getName());
     }
 }
