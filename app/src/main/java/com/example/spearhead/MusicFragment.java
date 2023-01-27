@@ -2,6 +2,8 @@ package com.example.spearhead;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +84,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         LinearLayout allMusic = (LinearLayout) view.findViewById(R.id.AllMusicButton);
         LinearLayout playlist = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
         allMusic.setOnClickListener(this::onClick);
+
         musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
         musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
         musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
@@ -89,11 +94,46 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
         musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
         musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
+
         recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
         LinearLayoutManager linearLayoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerList.setLayoutManager(linearLayoutManager);
         musicListAdapter= new MusicListAdapter(musicList, this);
         recyclerList.setAdapter(musicListAdapter);
+
+        CoordinatorLayout coordinatorLayout = view.findViewById(R.id.coordinator);
+        View nowPlayingLayout =  coordinatorLayout.findViewById(R.id.musicControlLayout);
+        BottomSheetBehavior sheetBehavior = BottomSheetBehavior.from(nowPlayingLayout);
+        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState){
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        Toast.makeText(getActivity(), "Collapsed", Toast.LENGTH_SHORT);
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        Toast.makeText(getActivity(), "Dragging", Toast.LENGTH_SHORT);
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        Toast.makeText(getActivity(), "Expanded", Toast.LENGTH_SHORT);
+                        break;
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        Toast.makeText(getActivity(), "Hidden", Toast.LENGTH_SHORT);
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        Toast.makeText(getActivity(), "Settling", Toast.LENGTH_SHORT);
+                        break;
+                    case BottomSheetBehavior.STATE_HALF_EXPANDED:
+                        Toast.makeText(getActivity(), "Half Expanded", Toast.LENGTH_SHORT);
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
         return view;
     }
 

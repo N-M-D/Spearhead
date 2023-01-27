@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MusicFragment">
+    tools:context=".MusicFragment"
+    android:id="@+id/coordinator">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -87,8 +88,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="5dp"
+            android:layout_marginEnd="70dp"
+            android:layout_marginBottom="503dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:layout_constraintBottom_toTopOf="@+id/frameLayout2"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
@@ -96,86 +99,85 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
-        <FrameLayout
-            android:id="@+id/frameLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <ImageView
-                android:id="@+id/musicControlBg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:scaleType="centerCrop"
-                android:src="@drawable/music_icon" />
-
-            <LinearLayout
-                android:id="@+id/MusicControl"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:background="#C6C0C0"
-                android:orientation="horizontal"
-                android:padding="3dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:text="Now Playing"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/currentSongTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="TextView"
-                        android:textSize="20sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/backBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:src="@drawable/previous_track_icon" />
-
-                    <ImageView
-                        android:id="@+id/playBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:src="@drawable/play_music_icon" />
-
-                    <ImageView
-                        android:id="@+id/skipBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:src="@drawable/skip_track_icon" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </FrameLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</FrameLayout>
+    <FrameLayout
+        android:id="@+id/musicControlLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:behavior_peekHeight="70dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <ImageView
+            android:id="@+id/musicControlBg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/music_icon" />
+
+        <LinearLayout
+            android:id="@+id/MusicControl"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="#C6C0C0"
+            android:orientation="horizontal"
+            android:padding="3dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="Now Playing"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/currentSongTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="TextView"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/backBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@drawable/previous_track_icon" />
+
+                <ImageView
+                    android:id="@+id/playBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@drawable/play_music_icon" />
+
+                <ImageView
+                    android:id="@+id/skipBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@drawable/skip_track_icon" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
