@@ -1,5 +1,8 @@
 package com.example.spearhead;
 
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,9 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -41,6 +46,15 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     RecyclerView recyclerList;
     MusicListAdapter musicListAdapter;
     List<Music> musicList = new ArrayList<>();
+    ImageView trackImgSmall;
+    TextView songTitle;
+    LinearLayout musicControlLayout;
+    ImageView trackImgBig;
+    LinearLayout trackControl;
+    ImageView backBtn;
+    ImageView playBtn;
+    ImageView skipBtn;
+
 
     public MusicFragment() {
         // Required empty public constructor
@@ -85,6 +99,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         LinearLayout playlist = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
         allMusic.setOnClickListener(this::onClick);
 
+        //Add Temp Music
         musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
         musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
         musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
@@ -101,21 +116,54 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         musicListAdapter= new MusicListAdapter(musicList, this);
         recyclerList.setAdapter(musicListAdapter);
 
+        musicControlLayout = (LinearLayout) view.findViewById(R.id.MusicControl);
+        trackImgSmall = (ImageView) view.findViewById(R.id.musicControlBg);
+        songTitle = (TextView) view.findViewById(R.id.currentSongTitle);
+        trackImgBig = (ImageView) view.findViewById(R.id.trackImgBig);
+        trackControl = (LinearLayout) view.findViewById(R.id.trackControl);
+        backBtn = (ImageView) view.findViewById(R.id.backBtn);
+        playBtn = (ImageView) view.findViewById(R.id.playBtn);
+        skipBtn = (ImageView) view.findViewById(R.id.skipBtn);
         CoordinatorLayout coordinatorLayout = view.findViewById(R.id.coordinator);
         View nowPlayingLayout =  coordinatorLayout.findViewById(R.id.musicControlLayout);
         BottomSheetBehavior sheetBehavior = BottomSheetBehavior.from(nowPlayingLayout);
-        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+        sheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 switch (newState){
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         Toast.makeText(getActivity(), "Collapsed", Toast.LENGTH_SHORT);
+                        //trackImgSmall.setVisibility(View.VISIBLE);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            trackImgSmall.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPx(70)));
+                            trackImgSmall.setRenderEffect(null);
+                        }
+                        musicControlLayout.setOrientation(LinearLayout.HORIZONTAL);
+                        musicControlLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPx(70)));
+
+                        trackControl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                        backBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                        playBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                        skipBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
                         Toast.makeText(getActivity(), "Dragging", Toast.LENGTH_SHORT);
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
                         Toast.makeText(getActivity(), "Expanded", Toast.LENGTH_SHORT);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            trackImgSmall.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                            trackImgSmall.setRenderEffect(RenderEffect.createBlurEffect(20, 20, Shader.TileMode.MIRROR));
+                        }
+                        musicControlLayout.setOrientation(LinearLayout.VERTICAL);
+                        musicControlLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+                        trackControl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 3));
+                        backBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                        playBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                        skipBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+
+                        trackImgBig.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 100));
                         break;
                     case BottomSheetBehavior.STATE_HIDDEN:
                         Toast.makeText(getActivity(), "Hidden", Toast.LENGTH_SHORT);
@@ -148,12 +196,14 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     }
 
     void changeNowPlaying(Music music){
-        LinearLayout nowPlayingLayout = (LinearLayout) getView().findViewById(R.id.MusicControl);
-        ImageView nowPlaying = (ImageView) getView().findViewById(R.id.musicControlBg);
-        TextView songTitle = (TextView) getView().findViewById(R.id.currentSongTitle);
-
-        nowPlayingLayout.setBackgroundResource(R.drawable.music_control_gradient);
-        nowPlaying.setImageResource(music.getImg());
+        musicControlLayout.setBackgroundResource(R.drawable.music_control_gradient);
+        trackImgSmall.setImageResource(music.getImg());
         songTitle.setText(music.getName());
+    }
+
+    int dpToPx(int dps){
+        final float scale = getContext().getResources().getDisplayMetrics().density;
+        int pixels = (int) (dps * scale + 0.5f);
+        return pixels;
     }
 }

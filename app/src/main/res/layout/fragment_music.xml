@@ -54,7 +54,7 @@
             app:layout_constraintTop_toBottomOf="@+id/AllMusicButton">
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/playlistIcon"
                 android:layout_width="68dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -111,20 +111,22 @@
         <ImageView
             android:id="@+id/musicControlBg"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="70dp"
             android:layout_weight="1"
             android:scaleType="centerCrop"
-            android:src="@drawable/music_icon" />
+            android:src="@drawable/music_icon"
+            android:layout_gravity="top"/>
 
         <LinearLayout
             android:id="@+id/MusicControl"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="match_parent"
             android:background="#C6C0C0"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="3dp">
 
             <LinearLayout
+                android:id="@+id/trackTitleLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -148,30 +150,38 @@
                     android:textSize="20sp" />
             </LinearLayout>
 
-            <LinearLayout
+            <ImageView
+                android:id="@+id/trackImgBig"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="100"
+                android:src="?android:attr/galleryItemBackground" />
+
+            <LinearLayout
+                android:id="@+id/trackControl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/backBtn"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:src="@drawable/previous_track_icon" />
 
                 <ImageView
                     android:id="@+id/playBtn"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:src="@drawable/play_music_icon" />
 
                 <ImageView
                     android:id="@+id/skipBtn"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:src="@drawable/skip_track_icon" />
             </LinearLayout>
