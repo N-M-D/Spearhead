@@ -2,6 +2,8 @@ package com.example.spearhead;
 
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -12,7 +14,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +21,13 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +57,11 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     ImageView backBtn;
     ImageView playBtn;
     ImageView skipBtn;
+    Music nowPlaying;
+    Boolean sheetUp = false;
+    ArrayList<Music> musicQueue = new ArrayList<>();
+    MediaPlayer mediaPlayer;
+    SeekBar seekBar;
 
 
     public MusicFragment() {
@@ -100,15 +108,15 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         allMusic.setOnClickListener(this::onClick);
 
         //Add Temp Music
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
 
         recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
         LinearLayoutManager linearLayoutManager = new GridLayoutManager(getActivity(), 2);
@@ -116,7 +124,22 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         musicListAdapter= new MusicListAdapter(musicList, this);
         recyclerList.setAdapter(musicListAdapter);
 
-        musicControlLayout = (LinearLayout) view.findViewById(R.id.MusicControl);
+        mediaPlayer = new MediaPlayer();
+        if(mediaPlayer.isPlaying()){
+
+        }
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if(musicQueue.size() > 0){
+                    nowPlaying = musicQueue.get(0);
+                    playTrack(nowPlaying);
+                    changeNowPlaying(nowPlaying);
+                }
+            }
+        });
+
+        musicControlLayout = (LinearLayout) view.findViewById(R.id.musicControl);
         trackImgSmall = (ImageView) view.findViewById(R.id.musicControlBg);
         songTitle = (TextView) view.findViewById(R.id.currentSongTitle);
         trackImgBig = (ImageView) view.findViewById(R.id.trackImgBig);
@@ -124,6 +147,20 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         backBtn = (ImageView) view.findViewById(R.id.backBtn);
         playBtn = (ImageView) view.findViewById(R.id.playBtn);
         skipBtn = (ImageView) view.findViewById(R.id.skipBtn);
+        seekBar = (SeekBar) view.findViewById(R.id.seekBar);
+
+        playBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mediaPlayer.isPlaying()){
+                    mediaPlayer.pause();
+                    playBtn.setImageResource(R.drawable.play_music_icon);
+                }else{
+                    mediaPlayer.start();
+                    playBtn.setImageResource(R.drawable.pause_icon);
+                }
+            }
+        });
         CoordinatorLayout coordinatorLayout = view.findViewById(R.id.coordinator);
         View nowPlayingLayout =  coordinatorLayout.findViewById(R.id.musicControlLayout);
         BottomSheetBehavior sheetBehavior = BottomSheetBehavior.from(nowPlayingLayout);
@@ -133,6 +170,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                 switch (newState){
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         Toast.makeText(getActivity(), "Collapsed", Toast.LENGTH_SHORT);
+                        sheetUp = false;
                         //trackImgSmall.setVisibility(View.VISIBLE);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             trackImgSmall.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPx(70)));
@@ -141,16 +179,21 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                         musicControlLayout.setOrientation(LinearLayout.HORIZONTAL);
                         musicControlLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPx(70)));
 
-                        trackControl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        backBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        playBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        skipBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                        trackControl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 3));
+                        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+                        backBtn.setLayoutParams(btnParams);
+                        playBtn.setLayoutParams(btnParams);
+                        skipBtn.setLayoutParams(btnParams);
+
+                        trackImgBig.setVisibility(View.GONE);
+                        seekBar.setVisibility(View.GONE);
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
                         Toast.makeText(getActivity(), "Dragging", Toast.LENGTH_SHORT);
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
                         Toast.makeText(getActivity(), "Expanded", Toast.LENGTH_SHORT);
+                        sheetUp = true;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             trackImgSmall.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
                             trackImgSmall.setRenderEffect(RenderEffect.createBlurEffect(20, 20, Shader.TileMode.MIRROR));
@@ -159,11 +202,21 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                         musicControlLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
                         trackControl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 3));
-                        backBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-                        playBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-                        skipBtn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                        LinearLayout.LayoutParams btnParamsBig = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dpToPx(70), 1);
+                        backBtn.setLayoutParams(btnParamsBig);
+                        playBtn.setLayoutParams(btnParamsBig);
+                        skipBtn.setLayoutParams(btnParamsBig);
 
-                        trackImgBig.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 100));
+                        LinearLayout.LayoutParams trackParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 100);
+                        trackParams.setMargins(dpToPx(50),dpToPx(50), dpToPx(50), dpToPx(50));
+                        trackImgBig.setLayoutParams(trackParams);
+
+                        trackImgBig.setVisibility(View.VISIBLE);
+                        seekBar.setVisibility(View.VISIBLE);
+                        if(nowPlaying != null){
+                            trackImgBig.setImageResource(nowPlaying.getImg());
+                        }
+
                         break;
                     case BottomSheetBehavior.STATE_HIDDEN:
                         Toast.makeText(getActivity(), "Hidden", Toast.LENGTH_SHORT);
@@ -192,18 +245,36 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
 
     @Override
     public void onItemClick(int pos) {
-        changeNowPlaying(musicList.get(pos));
+        if(!sheetUp) {
+            Music selectedMusic = musicList.get(pos);
+            changeNowPlaying(selectedMusic);
+            playTrack(selectedMusic);
+        }
     }
 
     void changeNowPlaying(Music music){
+        nowPlaying = music;
         musicControlLayout.setBackgroundResource(R.drawable.music_control_gradient);
         trackImgSmall.setImageResource(music.getImg());
         songTitle.setText(music.getName());
+
     }
 
     int dpToPx(int dps){
         final float scale = getContext().getResources().getDisplayMetrics().density;
         int pixels = (int) (dps * scale + 0.5f);
         return pixels;
+    }
+
+    private void playTrack(Music music){
+        try{
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(getActivity(), Uri.parse("android.resource://" + getContext().getPackageName() + "/" + music.getFile()));
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

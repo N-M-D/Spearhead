@@ -5,15 +5,17 @@ public class Music {
     private String name;
     private String artist;
     private int img;
+    private int file;
 
     public Music() {
 
     }
 
-    public Music(int img, String name, String artist) {
+    public Music(int img, String name, String artist, int file) {
         this.name = name;
         this.artist = artist;
         this.img = img;
+        this.file = file;
     }
 
     public Music(String name, String artist, int img, int ID) {
@@ -53,5 +55,13 @@ public class Music {
 
     public void setID(int ID) {
         this.ID = ID;
+    }
+
+    public int getFile() {
+        return file;
+    }
+
+    public void setFile(int file) {
+        this.file = file;
     }
 }
