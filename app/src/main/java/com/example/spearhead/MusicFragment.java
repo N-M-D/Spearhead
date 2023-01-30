@@ -149,6 +149,39 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         skipBtn = (ImageView) view.findViewById(R.id.skipBtn);
         seekBar = (SeekBar) view.findViewById(R.id.seekBar);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (mediaPlayer != null) {
+                    try {
+                        Thread.sleep(1000);
+                        if (mediaPlayer.isPlaying()) {
+                            int mCurrentPosition = mediaPlayer.getCurrentPosition();
+                            seekBar.setProgress(mCurrentPosition);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mediaPlayer.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
+
+
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -273,6 +306,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
             mediaPlayer.setDataSource(getActivity(), Uri.parse("android.resource://" + getContext().getPackageName() + "/" + music.getFile()));
             mediaPlayer.prepare();
             mediaPlayer.start();
+            playBtn.setImageResource(R.drawable.pause_icon);
+            seekBar.setMax(mediaPlayer.getDuration());
         } catch (IOException e) {
             e.printStackTrace();
         }
