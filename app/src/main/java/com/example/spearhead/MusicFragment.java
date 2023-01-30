@@ -119,15 +119,13 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
 
         recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         LinearLayoutManager linearLayoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerList.setLayoutManager(linearLayoutManager);
         musicListAdapter= new MusicListAdapter(musicList, this);
         recyclerList.setAdapter(musicListAdapter);
 
         mediaPlayer = new MediaPlayer();
-        if(mediaPlayer.isPlaying()){
-
-        }
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {

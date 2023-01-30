@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:descendantFocusability="blocksDescendants"
+    tools:context=".PlaylistCardTemplate">
+
+    <ImageView
+        android:id="@+id/playlistThumbnail"
+        android:layout_width="190dp"
+        android:layout_height="190dp"
+        android:layout_weight="1"
+        android:foreground="@drawable/musicgradient"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/playlistName"
+        android:layout_width="190dp"
+        android:layout_height="190dp"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif"
+        android:gravity="bottom"
+        android:padding="5dp"
+        android:text="Playlist Name"
+        android:textAlignment="gravity"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+</FrameLayout>
