@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +49,9 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     private String mParam2;
     RecyclerView recyclerList;
     MusicListAdapter musicListAdapter;
+    PlaylistsAdapter playlistsAdapter;
     List<Music> musicList = new ArrayList<>();
+    ArrayList<Playlist> playlists = new ArrayList<>();
     ImageView trackImgSmall;
     TextView songTitle;
     LinearLayout musicControlLayout;
@@ -59,7 +62,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     ImageView skipBtn;
     Music nowPlaying;
     Boolean sheetUp = false;
-    ArrayList<Music> musicQueue = new ArrayList<>();
+    Boolean musicPage = true;
+    List<Music> musicQueue = new ArrayList<>();
     MediaPlayer mediaPlayer;
     SeekBar seekBar;
 
@@ -103,9 +107,18 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_music, container, false);
-        LinearLayout allMusic = (LinearLayout) view.findViewById(R.id.AllMusicButton);
-        LinearLayout playlist = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
-        allMusic.setOnClickListener(this::onClick);
+        LinearLayout allMusicBtn = (LinearLayout) view.findViewById(R.id.AllMusicButton);
+        LinearLayout playlistBtn = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
+        allMusicBtn.setOnClickListener(this::onClick);
+        //playlistAdapter = new MusicListAdapter(playlists, this);
+        playlistsAdapter = new PlaylistsAdapter(this, playlists);
+        playlistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerList.setAdapter(playlistsAdapter);
+                musicPage = false;
+            }
+        });
 
         //Add Temp Music
         musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
@@ -118,8 +131,13 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
         musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
 
+        List<Music> testMusicList = new ArrayList<>();
+        testMusicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+        testMusicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+
+        playlists.add(new Playlist("TEst 1", testMusicList, R.drawable.calc));
+
         recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         LinearLayoutManager linearLayoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerList.setLayoutManager(linearLayoutManager);
         musicListAdapter= new MusicListAdapter(musicList, this);
@@ -277,9 +295,16 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     @Override
     public void onItemClick(int pos) {
         if(!sheetUp) {
-            Music selectedMusic = musicList.get(pos);
-            changeNowPlaying(selectedMusic);
-            playTrack(selectedMusic);
+            if(musicPage){
+                Music selectedMusic = musicList.get(pos);
+                changeNowPlaying(selectedMusic);
+                playTrack(selectedMusic);
+            }else{
+                musicQueue = playlists.get(pos).getMusicList();
+                playTrack(musicQueue.get(0));
+                changeNowPlaying(musicQueue.get(0));
+                musicQueue.remove(0);
+            }
         }
     }
 
