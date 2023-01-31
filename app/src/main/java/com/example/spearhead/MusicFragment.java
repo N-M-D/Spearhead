@@ -109,7 +109,13 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         View view = inflater.inflate(R.layout.fragment_music, container, false);
         LinearLayout allMusicBtn = (LinearLayout) view.findViewById(R.id.AllMusicButton);
         LinearLayout playlistBtn = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
-        allMusicBtn.setOnClickListener(this::onClick);
+        allMusicBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerList.setAdapter(musicListAdapter);
+                musicPage = true;
+            }
+        });
         //playlistAdapter = new MusicListAdapter(playlists, this);
         playlistsAdapter = new PlaylistsAdapter(this, playlists);
         playlistBtn.setOnClickListener(new View.OnClickListener() {
@@ -210,6 +216,24 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                 }
             }
         });
+
+        skipBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mediaPlayer.isPlaying()){
+                    mediaPlayer.seekTo(mediaPlayer.getDuration());
+                }
+            }
+        });
+
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mediaPlayer.isPlaying()){
+                    mediaPlayer.seekTo(0);
+                }
+            }
+        });
         CoordinatorLayout coordinatorLayout = view.findViewById(R.id.coordinator);
         View nowPlayingLayout =  coordinatorLayout.findViewById(R.id.musicControlLayout);
         BottomSheetBehavior sheetBehavior = BottomSheetBehavior.from(nowPlayingLayout);
@@ -288,16 +312,13 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     }
 
     @Override
-    public void onClick(View v){
-        Toast.makeText(getContext(), "Test", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
     public void onItemClick(int pos) {
         if(!sheetUp) {
             if(musicPage){
                 Music selectedMusic = musicList.get(pos);
                 changeNowPlaying(selectedMusic);
+                musicQueue.clear();
+                musicQueue.add(selectedMusic);
                 playTrack(selectedMusic);
             }else{
                 List<Music> playlistTracks = new ArrayList<>();
@@ -306,9 +327,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                 }
                 musicQueue = playlistTracks;
                 Log.d("MusicQueue", playlists.get(pos).getMusicList().size() + "");
-                playTrack(musicQueue.get(0));
                 changeNowPlaying(musicQueue.get(0));
-                musicQueue.remove(0);
+                playTrack(musicQueue.get(0));
             }
         }
     }
@@ -317,6 +337,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         nowPlaying = music;
         musicControlLayout.setBackgroundResource(R.drawable.music_control_gradient);
         trackImgSmall.setImageResource(music.getImg());
+        trackImgBig.setImageResource(music.getImg());
         songTitle.setText(music.getName());
 
     }
@@ -336,8 +357,14 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
             mediaPlayer.start();
             playBtn.setImageResource(R.drawable.pause_icon);
             seekBar.setMax(mediaPlayer.getDuration());
+            musicQueue.remove(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 }
