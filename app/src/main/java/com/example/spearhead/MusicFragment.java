@@ -300,7 +300,12 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                 changeNowPlaying(selectedMusic);
                 playTrack(selectedMusic);
             }else{
-                musicQueue = playlists.get(pos).getMusicList();
+                List<Music> playlistTracks = new ArrayList<>();
+                for(int i = 0; i < playlists.get(pos).getMusicList().size(); i++){
+                    playlistTracks.add(playlists.get(pos).getMusicList().get(i));
+                }
+                musicQueue = playlistTracks;
+                Log.d("MusicQueue", playlists.get(pos).getMusicList().size() + "");
                 playTrack(musicQueue.get(0));
                 changeNowPlaying(musicQueue.get(0));
                 musicQueue.remove(0);
