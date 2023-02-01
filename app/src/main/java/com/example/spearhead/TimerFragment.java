@@ -1,12 +1,16 @@
 package com.example.spearhead;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-
+import androidx.appcompat.widget.AppCompatEditText;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +23,15 @@ public class TimerFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private boolean change;
+
+    public boolean isChange() {
+        return change;
+    }
+
+    public void setChange(boolean change) {
+        this.change = change;
+    }
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -48,12 +61,25 @@ public class TimerFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        change= true;
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         getActivity().setTitle("Timer");
+    }
+    public void changeBackgroundColor(TextView textView) {
+        change = !change;
+        TextView changeType = textView.findViewById(R.id.changeType);
+        if(change){ //go rest theme
+            changeType.setText("Have a break");
+        }
+        else{// go study theme
+            changeType.setText("Time to grind");
+        }
+
+
     }
 
     @Override
