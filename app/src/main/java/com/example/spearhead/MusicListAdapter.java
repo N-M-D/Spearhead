@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.MyViewHolder> {
@@ -24,7 +25,9 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.MyVi
     @NonNull
     @Override
     public MusicListAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_music_card_template, parent, false);
+        int template;
+        template = R.layout.activity_music_card_template;
+        View view = LayoutInflater.from(parent.getContext()).inflate(template, parent, false);
         final MyViewHolder myViewHolder = new MyViewHolder(view);
         return myViewHolder;
     }

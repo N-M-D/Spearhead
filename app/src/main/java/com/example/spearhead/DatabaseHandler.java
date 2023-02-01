@@ -25,6 +25,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_USER_ID = "userid";
     private static final String KEY_NAME = "name";
     private static final String KEY_EMAIL = "email";
+    private static final String KEY_PASSWORD = "password";
 
     //Setup Music table fields
     private static final String KEY_MUSIC_ID = "musicid";
@@ -47,7 +48,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
                 + KEY_USER_ID + " INTEGER PRIMARY KEY,"
                 + KEY_NAME + " TEXT,"
-                + KEY_EMAIL + " TEXT"
+                + KEY_EMAIL + " TEXT,"
+                + KEY_PASSWORD + "TEXT"
                 + ")";
         String CREATE_MUSIC_TABLE = "CREATE TABLE " + TABLE_MUSIC + "("
                 + KEY_MUSIC_ID + " INTEGER PRIMARY KEY,"
@@ -76,6 +78,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Create tables again
         onCreate(db);
     }
+
+    void addUser(User user) throws Exception{
+        EncryptorDecryptor encryptorDecryptor = new EncryptorDecryptor();
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        String encryptedPassword = encryptorDecryptor.encrypt(user.getPassword());
+
+        values.put(KEY_USER_ID, user.getUserID());
+        values.put(KEY_EMAIL, user.getEmail());
+        values.put(KEY_PASSWORD, encryptedPassword);
+        values.put(KEY_NAME, user.getName());
+
+        db.insert(TABLE_USERS, null, values);
+        db.close();
+    }
+
+    Boolean userLogin(String email, String password) throws Exception{
+        Boolean verified = false;
+        EncryptorDecryptor encryptorDecryptor = new EncryptorDecryptor();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selectQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_EMAIL + " = " + email;
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if(cursor.moveToFirst()){
+            String encryptedPassword = cursor.getString(3);
+            String normalPassword = EncryptorDecryptor.decrypt(encryptedPassword);
+            if(encryptedPassword.equals(normalPassword)){
+                verified = true;
+            }
+        }
+        return verified;
+    }
+
 
     //Music Functions
     void addMusic(Music music){

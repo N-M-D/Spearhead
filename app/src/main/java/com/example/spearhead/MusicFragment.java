@@ -1,5 +1,10 @@
 package com.example.spearhead;
 
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,16 +15,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +49,25 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     private String mParam2;
     RecyclerView recyclerList;
     MusicListAdapter musicListAdapter;
+    PlaylistsAdapter playlistsAdapter;
     List<Music> musicList = new ArrayList<>();
+    ArrayList<Playlist> playlists = new ArrayList<>();
+    ImageView trackImgSmall;
+    TextView songTitle;
+    LinearLayout musicControlLayout;
+    ImageView trackImgBig;
+    LinearLayout trackControl;
+    ImageView backBtn;
+    ImageView playBtn;
+    ImageView skipBtn;
+    Music nowPlaying;
+    Boolean sheetUp = false;
+    Boolean musicPage = true;
+    List<Music> musicQueue = new ArrayList<>();
+    MediaPlayer mediaPlayer;
+    SeekBar seekBar;
+    Boolean threadDone = false;
+
 
     public MusicFragment() {
         // Required empty public constructor
@@ -67,33 +94,68 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         getActivity().setTitle("Music");
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        Toast.makeText(getActivity(), "onPause()", Toast.LENGTH_SHORT).show();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Toast.makeText(getActivity(), "onResume()", Toast.LENGTH_SHORT).show();
+        Log.d("MediaPlayer is Playing: ", mediaPlayer.isPlaying() + "");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d("onCreateView", "");
         View view = inflater.inflate(R.layout.fragment_music, container, false);
-        LinearLayout allMusic = (LinearLayout) view.findViewById(R.id.AllMusicButton);
-        LinearLayout playlist = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
-        allMusic.setOnClickListener(this::onClick);
+        LinearLayout allMusicBtn = (LinearLayout) view.findViewById(R.id.AllMusicButton);
+        LinearLayout playlistBtn = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
+        allMusicBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerList.setAdapter(musicListAdapter);
+                musicPage = true;
+            }
+        });
+        //playlistAdapter = new MusicListAdapter(playlists, this);
+        playlistsAdapter = new PlaylistsAdapter(this, playlists);
+        playlistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerList.setAdapter(playlistsAdapter);
+                musicPage = false;
+            }
+        });
 
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi"));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku"));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State"));
+        //Add Temp Music
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
+        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+
+        List<Music> testMusicList = new ArrayList<>();
+        testMusicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+        testMusicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+
+        playlists.add(new Playlist("TEst 1", testMusicList, R.drawable.calc));
 
         recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
         LinearLayoutManager linearLayoutManager = new GridLayoutManager(getActivity(), 2);
@@ -101,21 +163,120 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         musicListAdapter= new MusicListAdapter(musicList, this);
         recyclerList.setAdapter(musicListAdapter);
 
+        if(mediaPlayer == null){
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    if(musicQueue.size() > 0){
+                        nowPlaying = musicQueue.get(0);
+                        playTrack(nowPlaying);
+                        changeNowPlaying(nowPlaying);
+                    }
+                }
+            });
+        }
+
+
+        musicControlLayout = (LinearLayout) view.findViewById(R.id.musicControl);
+        trackImgSmall = (ImageView) view.findViewById(R.id.musicControlBg);
+        songTitle = (TextView) view.findViewById(R.id.currentSongTitle);
+        trackImgBig = (ImageView) view.findViewById(R.id.trackImgBig);
+        trackControl = (LinearLayout) view.findViewById(R.id.trackControl);
+        backBtn = (ImageView) view.findViewById(R.id.backBtn);
+        playBtn = (ImageView) view.findViewById(R.id.playBtn);
+        skipBtn = (ImageView) view.findViewById(R.id.skipBtn);
+        seekBar = (SeekBar) view.findViewById(R.id.seekBar);
+
+        setUpSeekBar();
+
+        playBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mediaPlayer.isPlaying()){
+                    mediaPlayer.pause();
+                    playBtn.setImageResource(R.drawable.play_music_icon);
+                }else{
+                    mediaPlayer.start();
+                    playBtn.setImageResource(R.drawable.pause_icon);
+                }
+            }
+        });
+
+        skipBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mediaPlayer.isPlaying()){
+                    mediaPlayer.seekTo(mediaPlayer.getDuration());
+                }
+            }
+        });
+
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mediaPlayer.isPlaying()){
+                    mediaPlayer.seekTo(0);
+                }
+            }
+        });
+
         CoordinatorLayout coordinatorLayout = view.findViewById(R.id.coordinator);
         View nowPlayingLayout =  coordinatorLayout.findViewById(R.id.musicControlLayout);
         BottomSheetBehavior sheetBehavior = BottomSheetBehavior.from(nowPlayingLayout);
-        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+        sheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 switch (newState){
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         Toast.makeText(getActivity(), "Collapsed", Toast.LENGTH_SHORT);
+                        sheetUp = false;
+                        //trackImgSmall.setVisibility(View.VISIBLE);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            trackImgSmall.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPx(70)));
+                            trackImgSmall.setRenderEffect(null);
+                        }
+                        musicControlLayout.setOrientation(LinearLayout.HORIZONTAL);
+                        musicControlLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPx(70)));
+
+                        trackControl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 3));
+                        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+                        backBtn.setLayoutParams(btnParams);
+                        playBtn.setLayoutParams(btnParams);
+                        skipBtn.setLayoutParams(btnParams);
+
+                        trackImgBig.setVisibility(View.GONE);
+                        seekBar.setVisibility(View.GONE);
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
                         Toast.makeText(getActivity(), "Dragging", Toast.LENGTH_SHORT);
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
                         Toast.makeText(getActivity(), "Expanded", Toast.LENGTH_SHORT);
+                        sheetUp = true;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            trackImgSmall.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                            trackImgSmall.setRenderEffect(RenderEffect.createBlurEffect(20, 20, Shader.TileMode.MIRROR));
+                        }
+                        musicControlLayout.setOrientation(LinearLayout.VERTICAL);
+                        musicControlLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+                        trackControl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 3));
+                        LinearLayout.LayoutParams btnParamsBig = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dpToPx(70), 1);
+                        backBtn.setLayoutParams(btnParamsBig);
+                        playBtn.setLayoutParams(btnParamsBig);
+                        skipBtn.setLayoutParams(btnParamsBig);
+
+                        LinearLayout.LayoutParams trackParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 100);
+                        trackParams.setMargins(dpToPx(50),dpToPx(50), dpToPx(50), dpToPx(50));
+                        trackImgBig.setLayoutParams(trackParams);
+
+                        trackImgBig.setVisibility(View.VISIBLE);
+                        seekBar.setVisibility(View.VISIBLE);
+                        if(nowPlaying != null){
+                            trackImgBig.setImageResource(nowPlaying.getImg());
+                        }
+
                         break;
                     case BottomSheetBehavior.STATE_HIDDEN:
                         Toast.makeText(getActivity(), "Hidden", Toast.LENGTH_SHORT);
@@ -138,22 +299,95 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     }
 
     @Override
-    public void onClick(View v){
-        Toast.makeText(getContext(), "Test", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
     public void onItemClick(int pos) {
-        changeNowPlaying(musicList.get(pos));
+        if(!sheetUp) {
+            if(musicPage){
+                Music selectedMusic = musicList.get(pos);
+                changeNowPlaying(selectedMusic);
+                musicQueue.clear();
+                musicQueue.add(selectedMusic);
+                playTrack(selectedMusic);
+            }else{
+                List<Music> playlistTracks = new ArrayList<>();
+                for(int i = 0; i < playlists.get(pos).getMusicList().size(); i++){
+                    playlistTracks.add(playlists.get(pos).getMusicList().get(i));
+                }
+                musicQueue = playlistTracks;
+                Log.d("MusicQueue", playlists.get(pos).getMusicList().size() + "");
+                changeNowPlaying(musicQueue.get(0));
+                playTrack(musicQueue.get(0));
+            }
+        }
     }
 
     void changeNowPlaying(Music music){
-        LinearLayout nowPlayingLayout = (LinearLayout) getView().findViewById(R.id.MusicControl);
-        ImageView nowPlaying = (ImageView) getView().findViewById(R.id.musicControlBg);
-        TextView songTitle = (TextView) getView().findViewById(R.id.currentSongTitle);
-
-        nowPlayingLayout.setBackgroundResource(R.drawable.music_control_gradient);
-        nowPlaying.setImageResource(music.getImg());
+        nowPlaying = music;
+        musicControlLayout.setBackgroundResource(R.drawable.music_control_gradient);
+        trackImgSmall.setImageResource(music.getImg());
+        trackImgBig.setImageResource(music.getImg());
         songTitle.setText(music.getName());
+
+    }
+
+    int dpToPx(int dps){
+        final float scale = getContext().getResources().getDisplayMetrics().density;
+        int pixels = (int) (dps * scale + 0.5f);
+        return pixels;
+    }
+
+    private void playTrack(Music music){
+        try{
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(getActivity(), Uri.parse("android.resource://" + getContext().getPackageName() + "/" + music.getFile()));
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            playBtn.setImageResource(R.drawable.pause_icon);
+            seekBar.setMax(mediaPlayer.getDuration());
+            musicQueue.remove(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+
+    }
+
+    void setUpSeekBar(){
+        if(!threadDone){
+            new Thread(() -> {
+                while (mediaPlayer != null) {
+                    try {
+                        Thread.sleep(1000);
+                        if (mediaPlayer.isPlaying()) {
+                            int mCurrentPosition = mediaPlayer.getCurrentPosition();
+                            Log.d("Current Position", mCurrentPosition + "");
+                            seekBar.setProgress(mCurrentPosition);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            threadDone = true;
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (fromUser) {
+                        mediaPlayer.seekTo(progress);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) { }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) { }
+            });
+        }else{
+            seekBar.setProgress(mediaPlayer.getCurrentPosition());
+        }
     }
 }
