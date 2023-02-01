@@ -66,6 +66,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     List<Music> musicQueue = new ArrayList<>();
     MediaPlayer mediaPlayer;
     SeekBar seekBar;
+    Boolean threadDone = false;
 
 
     public MusicFragment() {
@@ -93,19 +94,32 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         getActivity().setTitle("Music");
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        Toast.makeText(getActivity(), "onPause()", Toast.LENGTH_SHORT).show();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Toast.makeText(getActivity(), "onResume()", Toast.LENGTH_SHORT).show();
+        Log.d("MediaPlayer is Playing: ", mediaPlayer.isPlaying() + "");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d("onCreateView", "");
         View view = inflater.inflate(R.layout.fragment_music, container, false);
         LinearLayout allMusicBtn = (LinearLayout) view.findViewById(R.id.AllMusicButton);
         LinearLayout playlistBtn = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
@@ -149,17 +163,20 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         musicListAdapter= new MusicListAdapter(musicList, this);
         recyclerList.setAdapter(musicListAdapter);
 
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                if(musicQueue.size() > 0){
-                    nowPlaying = musicQueue.get(0);
-                    playTrack(nowPlaying);
-                    changeNowPlaying(nowPlaying);
+        if(mediaPlayer == null){
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    if(musicQueue.size() > 0){
+                        nowPlaying = musicQueue.get(0);
+                        playTrack(nowPlaying);
+                        changeNowPlaying(nowPlaying);
+                    }
                 }
-            }
-        });
+            });
+        }
+
 
         musicControlLayout = (LinearLayout) view.findViewById(R.id.musicControl);
         trackImgSmall = (ImageView) view.findViewById(R.id.musicControlBg);
@@ -171,38 +188,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         skipBtn = (ImageView) view.findViewById(R.id.skipBtn);
         seekBar = (SeekBar) view.findViewById(R.id.seekBar);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (mediaPlayer != null) {
-                    try {
-                        Thread.sleep(1000);
-                        if (mediaPlayer.isPlaying()) {
-                            int mCurrentPosition = mediaPlayer.getCurrentPosition();
-                            seekBar.setProgress(mCurrentPosition);
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    mediaPlayer.seekTo(progress);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-
+        setUpSeekBar();
 
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -234,6 +220,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                 }
             }
         });
+
         CoordinatorLayout coordinatorLayout = view.findViewById(R.id.coordinator);
         View nowPlayingLayout =  coordinatorLayout.findViewById(R.id.musicControlLayout);
         BottomSheetBehavior sheetBehavior = BottomSheetBehavior.from(nowPlayingLayout);
@@ -366,5 +353,41 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     @Override
     public void onClick(View view) {
 
+    }
+
+    void setUpSeekBar(){
+        if(!threadDone){
+            new Thread(() -> {
+                while (mediaPlayer != null) {
+                    try {
+                        Thread.sleep(1000);
+                        if (mediaPlayer.isPlaying()) {
+                            int mCurrentPosition = mediaPlayer.getCurrentPosition();
+                            Log.d("Current Position", mCurrentPosition + "");
+                            seekBar.setProgress(mCurrentPosition);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            threadDone = true;
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (fromUser) {
+                        mediaPlayer.seekTo(progress);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) { }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) { }
+            });
+        }else{
+            seekBar.setProgress(mediaPlayer.getCurrentPosition());
+        }
     }
 }
