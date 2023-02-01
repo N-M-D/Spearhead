@@ -15,7 +15,7 @@
             android:layout_width="187dp"
             android:layout_height="44dp"
             android:text="Grind time?"
-            android:textSize="34sp"
+            android:textSize="33sp"
             tools:layout_editor_absoluteX="112dp"
             tools:layout_editor_absoluteY="51dp" />
 
