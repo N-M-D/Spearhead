@@ -83,6 +83,7 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
                 change = !change;
                 if(change){
                     body.setBackgroundResource(R.drawable.blue_gradient);
+                    Log.d("Testing permission","permission moment");
                 }
                 else{
                     body.setBackgroundResource(R.drawable.purple_gradient);
