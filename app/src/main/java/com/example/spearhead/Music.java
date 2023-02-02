@@ -18,12 +18,6 @@ public class Music {
         this.file = file;
     }
 
-    public Music(String name, String artist, int img, int ID) {
-        this.ID = ID;
-        this.name = name;
-        this.artist = artist;
-        this.img = img;
-    }
 
     public String getName() {
         return name;

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.ContentView;
 import androidx.annotation.Nullable;
@@ -13,13 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "spearheadDB";
 
     //Setup Tables
     private static final String TABLE_USERS = "users";
     private static final String TABLE_MUSIC = "music";
     private static final String TABLE_PLAYLISTS = "playlists";
+    private static final String TABLE_PLAYLISTMUSIC = "playlistmusc";
 
     //Setup User table fields
     private static final String KEY_USER_ID = "userid";
@@ -32,11 +34,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_TITLE = "title";
     private static final String KEY_ARTIST = "artist";
     private static final String KEY_THUMBNAIL = "thumbnail";
+    private static final String KEY_FILE = "file";
 
     //Setup Playlist table fields
     private static final String KEY_PLAYLIST_ID = "playlistid";
     private static final String KEY_PLAYLIST_NAME = "playlistname";
     private static final String KEY_PLAYLIST_USER = "playlistuser";
+
+    //Setup PlaylistUser Fields
+    private static final String KEY_PLAYLISTMUSIC_ID = "playlistmusicid";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -55,17 +61,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_MUSIC_ID + " INTEGER PRIMARY KEY,"
                 + KEY_TITLE + " TEXT,"
                 + KEY_ARTIST + " TEXT,"
-                + KEY_THUMBNAIL + " INTEGER"
+                + KEY_THUMBNAIL + " INTEGER,"
+                + KEY_FILE + " INTEGER"
                 + ")";
         String CREATE_PLAYLIST_TABLE = "CREATE TABLE " + TABLE_PLAYLISTS + "("
                 + KEY_PLAYLIST_ID + " INTEGER PRIMARY KEY,"
                 + KEY_PLAYLIST_NAME + " TEXT,"
-                + KEY_PLAYLIST_USER + " TEXT,"
+                + KEY_PLAYLIST_USER + " INTEGER,"
                 + "FOREIGN KEY(" + KEY_PLAYLIST_USER + ") REFERENCES " + TABLE_USERS + "(" + KEY_USER_ID + ")"
                 + ")";
+        String CREATE_PLAYLIST_MUSIC_TABLE = "CREATE TABLE " + TABLE_PLAYLISTMUSIC + "("
+                + KEY_PLAYLISTMUSIC_ID + " INTEGER PRIMARY KEY,"
+                + KEY_PLAYLIST_ID + " INTEGER,"
+                + KEY_MUSIC_ID + " INTEGER" + ")";
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_MUSIC_TABLE);
         db.execSQL(CREATE_PLAYLIST_TABLE);
+        db.execSQL(CREATE_PLAYLIST_MUSIC_TABLE);
     }
 
     @Override
@@ -98,7 +110,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         db.close();
-        return  success;
+        return success;
     }
 
     int userLogin(String email, String password) throws Exception{
@@ -118,8 +130,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 userID = Integer.parseInt(cursor.getString(0));
             }
         }
-
-        db.close();
+        cursor.close();
 
         return userID;
     }
@@ -134,6 +145,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             exists = true;
         }
+        cursor.close();
 
         return exists;
     }
@@ -147,6 +159,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_TITLE, music.getName());
         values.put(KEY_THUMBNAIL, music.getImg());
+        values.put(KEY_ARTIST, music.getArtist());
+        values.put(KEY_FILE, music.getFile());
 
         // Inserting Row
         db.insert(TABLE_MUSIC, null, values);
@@ -154,7 +168,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
 
-    public List<Music> getMusic(){
+    public Music getMusicByID(int ID){
+        Music music = new Music();
+        SQLiteDatabase db = this.getWritableDatabase();
+        String GET_MUSIC_BY_ID_QUERY = "SELECT * FROM " + TABLE_MUSIC + " WHERE " + KEY_MUSIC_ID + "=?";
+        Cursor cursor = db.rawQuery(GET_MUSIC_BY_ID_QUERY, new String[]{ID + ""});
+        if(cursor.moveToFirst()){
+            String title = cursor.getString(1);
+            String artist = cursor.getString(2);
+            int img = cursor.getInt(3);
+            int file = cursor.getInt(4);
+
+            music.setID(ID);
+            music.setName(title);
+            music.setArtist(artist);
+            music.setImg(img);
+            music.setFile(file);
+        }
+        return music;
+    }
+
+    public List<Music> getAllMusic(){
         List<Music> musicList = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -179,5 +213,56 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // return contact list
         return musicList;
+    }
+
+    public void addPlaylist(int uid, List<Music> musicList, String name){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_PLAYLIST_NAME, name);
+        values.put(KEY_PLAYLIST_USER, uid);
+
+        long id = db.insert(TABLE_PLAYLISTS, null, values);
+        Log.d("ID", id + "");
+
+        for(int i = 0; i < musicList.size(); i++){
+            ContentValues playlistMusicValues = new ContentValues();
+            playlistMusicValues.put(KEY_PLAYLIST_ID, id);
+            playlistMusicValues.put(KEY_MUSIC_ID, musicList.get(i).getID());
+            db.insert(TABLE_PLAYLISTMUSIC, null, playlistMusicValues);
+        }
+
+        db.close();
+    }
+
+    public List<Playlist> getPlaylists(int uid){
+        List<Playlist> playlists = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String SELECT_PLAYLISTS_QUERY = "SELECT * FROM " + TABLE_PLAYLISTS + " WHERE " + KEY_PLAYLIST_USER + "=?";
+        Cursor cursor = db.rawQuery(SELECT_PLAYLISTS_QUERY, new String[]{uid + ""});
+        if(cursor.moveToFirst()){//Loop through Each playlist under the user
+            do{
+                List<Music> musicList = new ArrayList<>();
+                int playlistID = cursor.getInt(0);
+                String playlistName = cursor.getString(1);
+                int userID = cursor.getInt(2);
+                String SELECT_PLAYLIST_MUSIC_QUERY = "SELECT * FROM " + TABLE_PLAYLISTMUSIC + " WHERE " + KEY_PLAYLIST_ID + "=?";
+                Cursor musicListCursor = db.rawQuery(SELECT_PLAYLIST_MUSIC_QUERY, new String[]{playlistID + ""});
+
+                if(musicListCursor.moveToFirst()){//Loop through each music in the playlist
+                    do{
+                        Music music = getMusicByID(musicListCursor.getInt(2));
+                        musicList.add(music);
+                    }while (musicListCursor.moveToNext());
+                }
+                Playlist playlist = new Playlist(playlistName, userID, musicList);
+                playlists.add(playlist);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        Log.d("Num Playlists", playlists.size() + "");
+
+        return playlists;
     }
 }

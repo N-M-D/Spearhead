@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,6 +38,10 @@ public class LoginPage extends AppCompatActivity {
         btnGuest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                prefs = getSharedPreferences(UserPREFRENCE, MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(UID, -1);
+                editor.commit();
                 i = new Intent(LoginPage.this, MainActivity.class);
                 startActivity(i);
             }
@@ -58,6 +63,7 @@ public class LoginPage extends AppCompatActivity {
                 try {
                     int uid = db.userLogin(email, password);
                     if(uid > -1){
+                        Log.d("Uid", uid + "");
                         prefs = getSharedPreferences(UserPREFRENCE, MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putInt(UID, uid);

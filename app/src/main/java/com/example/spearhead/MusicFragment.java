@@ -53,7 +53,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     MusicListAdapter musicListAdapter;
     PlaylistsAdapter playlistsAdapter;
     List<Music> musicList = new ArrayList<>();
-    ArrayList<Playlist> playlists = new ArrayList<>();
+    List<Playlist> playlists = new ArrayList<>();
     ImageView trackImgSmall;
     TextView songTitle;
     LinearLayout musicControlLayout;
@@ -71,6 +71,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     Boolean threadDone = false;
     public static final String UserPREFRENCE = "UserPref";
     public static final String UID = "UserID";
+    int userID;
 
 
     public MusicFragment() {
@@ -104,7 +105,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(UserPREFRENCE, Context.MODE_PRIVATE);
-        Toast.makeText(getActivity(), sharedPreferences.getInt(UID, 0) + "", Toast.LENGTH_SHORT).show();
+        userID = sharedPreferences.getInt(UID, 0);
         getActivity().setTitle("Music");
     }
 
@@ -129,7 +130,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Log.d("onCreateView", "");
+        DatabaseHandler db = new DatabaseHandler(getActivity());
         View view = inflater.inflate(R.layout.fragment_music, container, false);
         LinearLayout allMusicBtn = (LinearLayout) view.findViewById(R.id.AllMusicButton);
         LinearLayout playlistBtn = (LinearLayout) view.findViewById(R.id.PlaylistsButton);
@@ -141,7 +142,11 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
             }
         });
         //playlistAdapter = new MusicListAdapter(playlists, this);
+
+        playlists = db.getPlaylists(userID);
+
         playlistsAdapter = new PlaylistsAdapter(this, playlists);
+        Log.d("Playlist Num", playlistsAdapter.getItemCount() + "");
         playlistBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -151,21 +156,25 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         });
 
         //Add Temp Music
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
-        musicList.add(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOAsobi", R.raw.yoru_ni_kakeru));
-        musicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
-        musicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+        musicList = db.getAllMusic();
 
-        List<Music> testMusicList = new ArrayList<>();
-        testMusicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
-        testMusicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+        TextView recent = view.findViewById(R.id.textView2);
+        recent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Music> musicList1 = new ArrayList<>();
+                musicList1.add(new Music(R.drawable.romeo_and_cinderella, "Romeo and Cinderella", "Hatsune Miku", R.raw.romeo_and_cinderella));
+                musicList1.add(new Music(R.drawable.kyoukaisen, "Kyoukaisen", "Amazashi", R.raw.kyoukaisen));
+                db.addPlaylist(userID, musicList, "TEst1");
+            }
+        });
 
-        playlists.add(new Playlist("TEst 1", testMusicList, R.drawable.calc));
+//        List<Music> testMusicList = new ArrayList<>();
+//        testMusicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
+//        testMusicList.add(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+
+
+
 
         recyclerList= (RecyclerView) view.findViewById(R.id.recentMusicList);
         LinearLayoutManager linearLayoutManager = new GridLayoutManager(getActivity(), 2);
@@ -319,6 +328,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                 playTrack(selectedMusic);
             }else{
                 List<Music> playlistTracks = new ArrayList<>();
+                Log.d("Pos", pos + "");
+                Log.d("Size", playlists.get(pos).getMusicList().size() + "");
                 for(int i = 0; i < playlists.get(pos).getMusicList().size(); i++){
                     playlistTracks.add(playlists.get(pos).getMusicList().get(i));
                 }
