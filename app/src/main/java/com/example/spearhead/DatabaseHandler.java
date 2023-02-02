@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "spearheadDB";
 
     //Setup Tables
@@ -49,7 +49,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_USER_ID + " INTEGER PRIMARY KEY,"
                 + KEY_NAME + " TEXT,"
                 + KEY_EMAIL + " TEXT,"
-                + KEY_PASSWORD + "TEXT"
+                + KEY_PASSWORD + " TEXT"
                 + ")";
         String CREATE_MUSIC_TABLE = "CREATE TABLE " + TABLE_MUSIC + "("
                 + KEY_MUSIC_ID + " INTEGER PRIMARY KEY,"
@@ -79,40 +79,65 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    void addUser(User user) throws Exception{
+    Boolean addUser(User user) throws Exception{
+        Boolean success = false;
         EncryptorDecryptor encryptorDecryptor = new EncryptorDecryptor();
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
         String encryptedPassword = encryptorDecryptor.encrypt(user.getPassword());
 
-        values.put(KEY_USER_ID, user.getUserID());
-        values.put(KEY_EMAIL, user.getEmail());
-        values.put(KEY_PASSWORD, encryptedPassword);
-        values.put(KEY_NAME, user.getName());
+        if(!emailExists(user.getEmail())){
+            //values.put(KEY_USER_ID, user.getUserID());
+            values.put(KEY_EMAIL, user.getEmail());
+            values.put(KEY_PASSWORD, encryptedPassword);
+            values.put(KEY_NAME, user.getName());
 
-        db.insert(TABLE_USERS, null, values);
+            db.insert(TABLE_USERS, null, values);
+            success = true;
+        }
+
         db.close();
+        return  success;
     }
 
-    Boolean userLogin(String email, String password) throws Exception{
+    int userLogin(String email, String password) throws Exception{
         Boolean verified = false;
+        int userID = -1;
         EncryptorDecryptor encryptorDecryptor = new EncryptorDecryptor();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String selectQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_EMAIL + " = " + email;
+        String selectQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_EMAIL + " = ?";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        Cursor cursor = db.rawQuery(selectQuery,  new String[] {email});
 
         if(cursor.moveToFirst()){
             String encryptedPassword = cursor.getString(3);
-            String normalPassword = EncryptorDecryptor.decrypt(encryptedPassword);
-            if(encryptedPassword.equals(normalPassword)){
-                verified = true;
+            String normalPassword = encryptorDecryptor.decrypt(encryptedPassword);
+            if(password.equals(normalPassword)){
+                userID = Integer.parseInt(cursor.getString(0));
             }
         }
-        return verified;
+
+        db.close();
+
+        return userID;
     }
+
+    Boolean emailExists(String email) throws Exception{
+        Boolean exists = false;
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selectQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(selectQuery, new String[] {email});
+
+        if(cursor.moveToFirst()){
+            exists = true;
+        }
+
+        return exists;
+    }
+
 
 
     //Music Functions

@@ -1,5 +1,7 @@
 package com.example.spearhead;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
 import android.media.MediaPlayer;
@@ -67,6 +69,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     MediaPlayer mediaPlayer;
     SeekBar seekBar;
     Boolean threadDone = false;
+    public static final String UserPREFRENCE = "UserPref";
+    public static final String UID = "UserID";
 
 
     public MusicFragment() {
@@ -99,6 +103,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(UserPREFRENCE, Context.MODE_PRIVATE);
+        Toast.makeText(getActivity(), sharedPreferences.getInt(UID, 0) + "", Toast.LENGTH_SHORT).show();
         getActivity().setTitle("Music");
     }
 
@@ -113,6 +119,10 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         super.onResume();
         Toast.makeText(getActivity(), "onResume()", Toast.LENGTH_SHORT).show();
         Log.d("MediaPlayer is Playing: ", mediaPlayer.isPlaying() + "");
+        if(nowPlaying != null){
+            changeNowPlaying(nowPlaying);
+        }
+        seekBar.setProgress(mediaPlayer.getCurrentPosition());
     }
 
     @Override
