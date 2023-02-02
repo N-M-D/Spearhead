@@ -54,4 +54,25 @@ public class Time {
     public void setTinyNum(int tinyNum) {
         this.tinyNum = tinyNum;
     }
+
+    public String getlargeString(){
+        String L=Integer.toString(largeNum);
+        return L;
+    }
+    public String getbigString(){
+        String B=Integer.toString(bigNum);
+        return B;
+    }
+    public String getmedString(){
+        String M=Integer.toString(medNum);
+        return M;
+    }
+    public String getsmallString(){
+        String S=Integer.toString(smallNum);
+        return S;
+    }
+    public String gettinyString(){
+        String T=Integer.toString(tinyNum);
+        return T;
+    }
 }
