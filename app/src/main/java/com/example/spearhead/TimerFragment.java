@@ -85,7 +85,7 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
                     body.setBackgroundResource(R.drawable.blue_gradient);
                 }
                 else{
-                    body.setBackgroundResource(R.drawable.purple_gradient);
+                    body.setBackgroundResource(R.drawable.purple_gradient);//
                 }
 
             }
