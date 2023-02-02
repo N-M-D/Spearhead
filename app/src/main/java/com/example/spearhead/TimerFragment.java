@@ -1,11 +1,16 @@
 package com.example.spearhead;
 
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +18,7 @@ import android.view.View;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,11 +35,16 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private boolean condition = true;
+    //EditTimeFragment fragment = new EditTimeFragment();
+    String large,big,med,small,tiny;
     TextView changeTypes;
     TextView timerTitle;
-    Time studyTime;
-    Time restTime;
+    TextView largeNum,bigNum,medNum,smallNum,tinyNum;
+    Time studyTime,restTime;
+    TextView editBtn;
     ConstraintLayout body;
+    SharedPreferences prefs;
+    AlertDialog dialog;
 
 
 
@@ -77,10 +88,15 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         condition= true;
-        studyTime= new Time(55,25,15,10,5);
-        restTime= new Time(55,25,15,10,5);
+        studyTime= new Time(60,25,15,10,5);
+        restTime= new Time(45,20,10,5,2);
         View view = inflater.inflate(R.layout.fragment_timer, container, false);
-
+        editBtn = (TextView) view.findViewById(R.id.editBtn);
+         largeNum= (TextView) view.findViewById(R.id.largeNum);
+         bigNum= (TextView) view.findViewById(R.id.bigNum);
+         medNum= (TextView) view.findViewById(R.id.medNum);
+         smallNum= (TextView) view.findViewById(R.id.smallNum);
+         tinyNum= (TextView) view.findViewById(R.id.tinyNum);
          body = (ConstraintLayout) view.findViewById(R.id.body);
         timerTitle = (TextView) view.findViewById(R.id.timerTitle);
         changeTypes = (TextView) view.findViewById(R.id.changeType);
@@ -92,20 +108,56 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
                 if(condition){// change to study timer set
                     timerTitle.setText("Grind time?");
                     body.setBackground(getResources().getDrawable(R.drawable.blue_gradient));
+                    large = studyTime.getlargeString();
+                    big = studyTime.getbigString();
+                    med = studyTime.getmedString();
+                    small = studyTime.getsmallString();
+                    tiny = studyTime.gettinyString();
+                    largeNum.setText(large);
+                    bigNum.setText(big);
+                    medNum.setText(med);
+                    smallNum.setText(small);
+                    tinyNum.setText(tiny);
+
 
                 }
                 else{// change to rest timer set
                     timerTitle.setText("Have a break?");
                     body.setBackground(getResources().getDrawable(R.drawable.purple_gradient));
+                    large = restTime.getlargeString();
+                    big = restTime.getbigString();
+                    med = restTime.getmedString();
+                    small = restTime.getsmallString();
+                    tiny = restTime.gettinyString();
+                    largeNum.setText(large);
+                    bigNum.setText(big);
+                    medNum.setText(med);
+                    smallNum.setText(small);
+                    tinyNum.setText(tiny);
 
                 }
 
+            }
+
+        });
+        editBtn.setOnClickListener(new View.OnClickListener() {//open EditTimeFragment
+            @Override
+            public void onClick(View view) {
+                EditTimeFragment editTimeFragment = new EditTimeFragment();
+                editTimeFragment.show(getActivity().getSupportFragmentManager(), "EditFragment");
             }
         });
 //         Inflate the layout for this fragment
 
         return view;
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+    }
+
 
     @Override
     public void onClick(View view) {

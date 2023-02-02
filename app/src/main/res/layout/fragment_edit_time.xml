@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context=".EditTimeFragment">
+
+
+    <TextView
+        android:id="@+id/editBubbleText"
+        android:layout_width="326dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="11dp"
+        android:text="Edit Time Bubbles"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/largeNum"
+        android:layout_width="172dp"
+        android:layout_height="176dp"
+        android:inputType="none"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="39dp"
+        android:background="@drawable/circle_shape_dark"
+        android:gravity="center"
+        android:text="55"
+        android:textAlignment="center"
+        android:textColor="#fff"
+        android:textSize="96sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/bigNum"
+        app:layout_constraintTop_toBottomOf="@+id/smallNum" />
+
+    <EditText
+        android:id="@+id/bigNum"
+        android:layout_width="136dp"
+        android:layout_height="136dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="13dp"
+        android:inputType="none"
+        android:background="@drawable/circle_shape_dark"
+        android:gravity="center"
+        android:text="25"
+        android:textAlignment="center"
+        android:textColor="#fff"
+        android:textSize="70sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/medNum" />
+
+    <EditText
+        android:id="@+id/medNum"
+        android:layout_width="111dp"
+        android:layout_height="110dp"
+        android:layout_marginStart="30dp"
+        android:inputType="none"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="29dp"
+        android:background="@drawable/circle_shape_dark"
+        android:gravity="center"
+        android:text="15"
+        android:textAlignment="center"
+        android:textColor="#fff"
+        android:textSize="55sp"
+        app:layout_constraintEnd_toStartOf="@+id/largeNum"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tinyNum" />
+
+    <EditText
+        android:id="@+id/smallNum"
+        android:layout_width="102dp"
+        android:layout_height="99dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="30dp"
+        android:inputType="none"
+        android:background="@drawable/circle_shape_dark"
+        android:gravity="center"
+        android:text="10"
+        android:textAlignment="center"
+        android:textColor="#fff"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tinyNum"
+        app:layout_constraintTop_toBottomOf="@+id/editBubbleText" />
+
+    <EditText
+        android:id="@+id/tinyNum"
+        android:layout_width="85dp"
+        android:layout_height="78dp"
+        android:layout_marginStart="99dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/circle_shape_dark"
+        android:gravity="center"
+        android:inputType="none"
+        android:text="5"
+        android:textAlignment="center"
+        android:textColor="#fff"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editBubbleText" />
+
+    <TextView
+        android:id="@+id/submitBtn"
+        android:layout_width="88dp"
+        android:layout_height="31dp"
+        android:layout_marginStart="57dp"
+        android:layout_marginTop="27dp"
+        android:layout_marginEnd="56dp"
+        android:text="Done"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/bigNum"
+        app:layout_constraintTop_toBottomOf="@+id/largeNum" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
