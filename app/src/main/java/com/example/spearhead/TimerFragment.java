@@ -3,35 +3,35 @@ package com.example.spearhead;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.widget.AppCompatEditText;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link TimerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TimerFragment extends Fragment {
+public class TimerFragment extends Fragment implements  View.OnClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private boolean change;
+    TextView changeTypes;
+    Time timeList;
 
-    public boolean isChange() {
-        return change;
-    }
-
-    public void setChange(boolean change) {
-        this.change = change;
-    }
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -61,7 +61,7 @@ public class TimerFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        change= true;
+
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -69,23 +69,34 @@ public class TimerFragment extends Fragment {
         }
         getActivity().setTitle("Timer");
     }
-    public void changeBackgroundColor(TextView textView) {
-        change = !change;
-        TextView changeType = textView.findViewById(R.id.changeType);
-        if(change){ //go rest theme
-            changeType.setText("Have a break");
-        }
-        else{// go study theme
-            changeType.setText("Time to grind");
-        }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        change= true;
+        View view = inflater.inflate(R.layout.fragment_timer, container, false);
 
+        ConstraintLayout body = (ConstraintLayout) view.findViewById(R.id.body);
+        changeTypes = (TextView) view.findViewById(R.id.changeType);
+        changeTypes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                change = !change;
+                if(change){
+                    body.setBackgroundResource(R.drawable.blue_gradient);
+                }
+                else{
+                    body.setBackgroundResource(R.drawable.purple_gradient);//
+                }
+
+            }
+        });
+//         Inflate the layout for this fragment
+
+        return view;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_timer, container, false);
+    public void onClick(View view) {
+
     }
 }
