@@ -28,9 +28,13 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private boolean change;
+    private boolean condition = true;
     TextView changeTypes;
-    Time timeList;
+    TextView timerTitle;
+    Time studyTime;
+    Time restTime;
+    ConstraintLayout body;
+
 
 
     // TODO: Rename and change types of parameters
@@ -72,21 +76,28 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        change= true;
+        condition= true;
+        studyTime= new Time(55,25,15,10,5);
+        restTime= new Time(55,25,15,10,5);
         View view = inflater.inflate(R.layout.fragment_timer, container, false);
 
-        ConstraintLayout body = (ConstraintLayout) view.findViewById(R.id.body);
+         body = (ConstraintLayout) view.findViewById(R.id.body);
+        timerTitle = (TextView) view.findViewById(R.id.timerTitle);
         changeTypes = (TextView) view.findViewById(R.id.changeType);
+
         changeTypes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                change = !change;
-                if(change){
-                    body.setBackgroundResource(R.drawable.blue_gradient);
-                    Log.d("Testing permission","permission moment");
+                    condition= !condition;
+                if(condition){// change to study timer set
+                    timerTitle.setText("Grind time?");
+                    body.setBackground(getResources().getDrawable(R.drawable.blue_gradient));
+
                 }
-                else{
-                    body.setBackgroundResource(R.drawable.purple_gradient);
+                else{// change to rest timer set
+                    timerTitle.setText("Have a break?");
+                    body.setBackground(getResources().getDrawable(R.drawable.purple_gradient));
+
                 }
 
             }
