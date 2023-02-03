@@ -1,5 +1,6 @@
 package com.example.spearhead;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +27,9 @@ public class EditTimeFragment extends DialogFragment implements  View.OnClickLis
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     EditText largeNum,bigNum,medNum,smallNum,tinyNum;
+    SharedPreferences prefs;
+    TextView submitBtn;
+    String L,B,M,S,T;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -60,10 +67,31 @@ public class EditTimeFragment extends DialogFragment implements  View.OnClickLis
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_edit_time, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_time, container, false);
+
+        largeNum = (EditText) view.findViewById(R.id.largeNum);
+        bigNum = (EditText) view.findViewById(R.id.bigNum);
+        medNum = (EditText) view.findViewById(R.id.medNum);
+        smallNum = (EditText) view.findViewById(R.id.smallNum);
+        tinyNum = (EditText) view.findViewById(R.id.tinyNum);
+        submitBtn = (TextView) view.findViewById(R.id.submitBtn);
+
+        submitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                L = largeNum.getText().toString();
+                B = bigNum.getText().toString();
+                M = medNum.getText().toString();
+                S = smallNum.getText().toString();
+                T = tinyNum.getText().toString();
+
+
+            }
+            });
+
+        return view;
     }
 
     @Override
