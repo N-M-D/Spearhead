@@ -1,5 +1,7 @@
 package com.example.spearhead;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -11,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,6 +50,12 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
     AlertDialog dialog;
 
 
+    public static final String TimerPREFRENCE = "TimePref";
+    public static final String L_UID = "L_ID";
+    public static final String B_UID = "B_ID";
+    public static final String M_UID = "M_ID";
+    public static final String S_UID = "S_ID";
+    public static final String T_UID = "T_ID";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -118,7 +127,14 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
                     medNum.setText(med);
                     smallNum.setText(small);
                     tinyNum.setText(tiny);
-
+                    prefs = getActivity().getSharedPreferences(TimerPREFRENCE, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString(L_UID, large);
+                    editor.putString(B_UID, big);
+                    editor.putString(M_UID, med);
+                    editor.putString(S_UID, small);
+                    editor.putString(T_UID, tiny);
+                    editor.commit();
 
                 }
                 else{// change to rest timer set
@@ -135,6 +151,15 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
                     smallNum.setText(small);
                     tinyNum.setText(tiny);
 
+                    prefs = getActivity().getSharedPreferences(TimerPREFRENCE, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString(L_UID, large);
+                    editor.putString(B_UID, big);
+                    editor.putString(M_UID, med);
+                    editor.putString(S_UID, small);
+                    editor.putString(T_UID, tiny);
+                    editor.commit();
+
                 }
 
             }
@@ -145,6 +170,18 @@ public class TimerFragment extends Fragment implements  View.OnClickListener {
             public void onClick(View view) {
                 EditTimeFragment editTimeFragment = new EditTimeFragment();
                 editTimeFragment.show(getActivity().getSupportFragmentManager(), "EditFragment");
+            }
+        });
+
+        tinyNum.setOnClickListener(new View.OnClickListener() {//open EditTimeFragment
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                DisplayTimeFragment displayTimeFragment = new DisplayTimeFragment();
+                fragmentTransaction.replace(R.id.body, displayTimeFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
 //         Inflate the layout for this fragment
