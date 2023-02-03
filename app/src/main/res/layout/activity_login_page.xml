@@ -41,7 +41,7 @@
         android:layout_margin="14dp"
         android:autofillHints="Username"
         android:background="@drawable/edit"
-        android:drawableStart="@drawable/ic_profile"
+        android:drawableStart="@drawable/email_icon"
         android:drawablePadding="15dp"
         android:elevation="6dp"
         android:hint="Email"

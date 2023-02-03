@@ -230,16 +230,20 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
             }
         });
 
-        TextView recent = view.findViewById(R.id.textView2);
-        recent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<Music> musicList1 = new ArrayList<>();
-                musicList1.add(new Music(R.drawable.romeo_and_cinderella, "Romeo and Cinderella", "Hatsune Miku", R.raw.romeo_and_cinderella));
-                musicList1.add(new Music(R.drawable.kyoukaisen, "Kyoukaisen", "Amazashi", R.raw.kyoukaisen));
-                db.addPlaylist(userID, musicList, "TEst1");
-            }
-        });
+//        TextView recent = view.findViewById(R.id.textView2);
+//        recent.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                DatabaseHandler db = new DatabaseHandler(getActivity());
+//                db.addMusic(new Music(R.drawable.into_the_night, "Yoru Ni Kakeru", "YOASOBI", R.raw.yoru_ni_kakeru));
+//                db.addMusic(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates of State", R.raw.i_wanna_run));
+//                db.addMusic(new Music(R.drawable.kyoukaisen, "Kyoukaisen", "Amazashi", R.raw.kyoukaisen));
+//                db.addMusic(new Music(R.drawable.lilas, "LilaS", "Lena", R.raw.lilas));
+//                db.addMusic(new Music(R.drawable.romeo_and_cinderella, "Romeo and Cinderella", "Hatsune Miku", R.raw.romeo_and_cinderella));
+//                db.addMusic(new Music(R.drawable.calc, "Calc", "Hatsune Miku", R.raw.calc));
+//
+//            }
+//        });
 
 //        List<Music> testMusicList = new ArrayList<>();
 //        testMusicList.add(new Music(R.drawable.i_wanna_run, "I Wanna Run", "Mates Of State", R.raw.i_wanna_run));
@@ -432,6 +436,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
         try{
             mediaPlayer.stop();
             mediaPlayer.reset();
+            Log.d("File", music.getFile() + "");
             mediaPlayer.setDataSource(getActivity(), Uri.parse("android.resource://" + getContext().getPackageName() + "/" + music.getFile()));
             mediaPlayer.prepare();
             mediaPlayer.start();

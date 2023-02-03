@@ -33,18 +33,22 @@ public class RegisterPage extends AppCompatActivity {
                 String email = registerEmail.getText().toString();
                 String password = registerPassword.getText().toString();
 
-                User user = new User(email, password, username);
-                try {
-                    Boolean success = db.addUser(user);
-                    if(success){
-                        Toast.makeText(getApplicationContext(), "Account Created Successfully!", Toast.LENGTH_LONG).show();
-                        Intent i = new Intent(RegisterPage.this, LoginPage.class);
-                        startActivity(i);
-                    }else{
-                        Toast.makeText(getApplicationContext(), "Email already in use!", Toast.LENGTH_LONG).show();
+                if(username.matches("") || email.matches("") || password.matches("")){
+                    Toast.makeText(getApplicationContext(), "Please enter all fields!", Toast.LENGTH_LONG).show();
+                }else{
+                    User user = new User(email, password, username);
+                    try {
+                        Boolean success = db.addUser(user);
+                        if(success){
+                            Toast.makeText(getApplicationContext(), "Account Created Successfully!", Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(RegisterPage.this, LoginPage.class);
+                            startActivity(i);
+                        }else{
+                            Toast.makeText(getApplicationContext(), "Email already in use!", Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         });

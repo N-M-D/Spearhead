@@ -3,6 +3,7 @@ package com.example.spearhead;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 7;
     private static final String DATABASE_NAME = "spearheadDB";
 
     //Setup Tables
@@ -86,6 +87,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MUSIC);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYLISTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYLISTMUSIC);
 
         // Create tables again
         onCreate(db);
@@ -204,6 +206,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 music.setName(cursor.getString(1));
                 music.setArtist(cursor.getString(2));
                 music.setImg(Integer.parseInt(cursor.getString(3)));
+                music.setFile(Integer.parseInt(cursor.getString(4)));
                 // Adding contact to list
                 musicList.add(music);
             } while (cursor.moveToNext());
