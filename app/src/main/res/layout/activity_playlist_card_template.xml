@@ -2,11 +2,67 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:descendantFocusability="blocksDescendants"
     tools:context=".PlaylistCardTemplate">
+
+    <ImageView
+        android:id="@+id/quarterImg1"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/all_music_icon" />
+
+    <ImageView
+        android:id="@+id/quarterImg2"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
+        android:layout_gravity="right"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/all_music_icon" />
+
+    <ImageView
+        android:id="@+id/quarterImg3"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
+        android:layout_gravity="bottom|left"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/all_music_icon" />
+
+    <ImageView
+        android:id="@+id/quarterImg4"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
+        android:layout_gravity="bottom|right"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/all_music_icon" />
+
+    <ImageView
+        android:id="@+id/halfImg1"
+        android:layout_width="95dp"
+        android:layout_height="190dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/all_music_icon" />
+
+    <ImageView
+        android:id="@+id/halfImg2"
+        android:layout_width="95dp"
+        android:layout_height="190dp"
+        android:layout_gravity="right"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/all_music_icon" />
 
     <ImageView
         android:id="@+id/playlistThumbnail"
@@ -14,7 +70,7 @@
         android:layout_height="190dp"
         android:layout_weight="1"
         android:foreground="@drawable/musicgradient"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/playlistName"
