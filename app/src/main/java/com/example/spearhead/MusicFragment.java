@@ -117,7 +117,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     @Override
     public void onPause() {
         super.onPause();
-        Toast.makeText(getActivity(), "onPause()", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -203,7 +202,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
                         for (int i = 0; i < checkedItems.length; i++) {
                             if (checkedItems[i]) {
                                 Log.d("Music Selected", musicList.get(i).getArtist());
-                                Toast.makeText(getActivity(), "Submitted", Toast.LENGTH_SHORT).show();
                                 selectedMusic.add(musicList.get(i));
                             }
                         }
@@ -324,7 +322,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 switch (newState){
                     case BottomSheetBehavior.STATE_COLLAPSED:
-                        Toast.makeText(getActivity(), "Collapsed", Toast.LENGTH_SHORT);
                         sheetUp = false;
                         //trackImgSmall.setVisibility(View.VISIBLE);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
