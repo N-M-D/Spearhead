@@ -40,7 +40,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.MyVi
         }else if (musicCount == 2){
             holder.halfImg1.setVisibility(View.VISIBLE);
             holder.halfImg2.setVisibility(View.VISIBLE);
-            holder.halfImg2.setImageResource(playlists.get(position).getMusicList().get(0).getImg());
+            holder.halfImg1.setImageResource(playlists.get(position).getMusicList().get(0).getImg());
             holder.halfImg2.setImageResource(playlists.get(position).getMusicList().get(1).getImg());
         }else if (musicCount == 3){
             holder.quarterImg1.setVisibility(View.VISIBLE);

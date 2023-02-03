@@ -1,5 +1,6 @@
 package com.example.spearhead;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.RenderEffect;
@@ -16,11 +17,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,9 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -72,7 +77,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     public static final String UserPREFRENCE = "UserPref";
     public static final String UID = "UserID";
     int userID;
-
+    FloatingActionButton addPlaylistBtn;
 
     public MusicFragment() {
         // Required empty public constructor
@@ -118,8 +123,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
     @Override
     public void onResume() {
         super.onResume();
-        Toast.makeText(getActivity(), "onResume()", Toast.LENGTH_SHORT).show();
-        Log.d("MediaPlayer is Playing: ", mediaPlayer.isPlaying() + "");
         if(nowPlaying != null){
             changeNowPlaying(nowPlaying);
         }
@@ -138,25 +141,94 @@ public class MusicFragment extends Fragment implements View.OnClickListener, Rec
             @Override
             public void onClick(View view) {
                 recyclerList.setAdapter(musicListAdapter);
+                addPlaylistBtn.setVisibility(View.GONE);
                 musicPage = true;
             }
         });
         //playlistAdapter = new MusicListAdapter(playlists, this);
 
+        musicList = db.getAllMusic();
         playlists = db.getPlaylists(userID);
 
         playlistsAdapter = new PlaylistsAdapter(this, playlists);
-        Log.d("Playlist Num", playlistsAdapter.getItemCount() + "");
         playlistBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 recyclerList.setAdapter(playlistsAdapter);
                 musicPage = false;
+                addPlaylistBtn.setVisibility(View.VISIBLE);
             }
         });
 
-        //Add Temp Music
-        musicList = db.getAllMusic();
+        addPlaylistBtn = view.findViewById(R.id.addPLaylistBtn);
+        addPlaylistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!sheetUp){
+                    String[] titleList = new String[musicList.size()];
+                    boolean[] checkedItems = new boolean[musicList.size()];
+                    List<String> selectedItems = Arrays.asList(titleList);
+
+                    for(int i = 0; i < musicList.size(); i++){
+                        titleList[i] = musicList.get(i).getName();
+                    }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                    //Set title for dialog
+                    builder.setTitle("Add Playlist");
+
+                    //Set icon for the dialog
+                    builder.setIcon(R.drawable.app_logo);
+
+                    EditText input = new EditText(getActivity());
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    input.setHint("Playlist name");
+
+                    // now this is the function which sets the alert dialog for multiple item selection ready
+                    builder.setMultiChoiceItems(titleList, checkedItems, (dialog, which, isChecked) -> {
+                        checkedItems[which] = isChecked;
+                        String currentItem = selectedItems.get(which);
+                    });
+
+                    builder.setView(input);
+
+                    // alert dialog shouldn't be cancellable
+                    builder.setCancelable(false);
+
+                    // handle the positive button of the dialog
+                    builder.setPositiveButton("Done", (dialog, which) -> {
+                        DatabaseHandler db = new DatabaseHandler(getActivity());
+                        List<Music> selectedMusic = new ArrayList<>();
+                        for (int i = 0; i < checkedItems.length; i++) {
+                            if (checkedItems[i]) {
+                                Log.d("Music Selected", musicList.get(i).getArtist());
+                                Toast.makeText(getActivity(), "Submitted", Toast.LENGTH_SHORT).show();
+                                selectedMusic.add(musicList.get(i));
+                            }
+                        }
+                        String name = input.getText().toString();
+                        db.addPlaylist(userID, selectedMusic, name);
+
+                    });
+
+                    // handle the negative button of the alert dialog
+                    builder.setNegativeButton("CANCEL", (dialog, which) -> {});
+
+                    // handle the neutral button of the dialog to clear the selected items boolean checkedItem
+                    builder.setNeutralButton("CLEAR ALL", (dialog, which) -> {
+                        Arrays.fill(checkedItems, false);
+                    });
+
+                    // create the builder
+                    builder.create();
+
+                    // create the alert dialog with the alert dialog builder instance
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
+            }
+        });
 
         TextView recent = view.findViewById(R.id.textView2);
         recent.setOnClickListener(new View.OnClickListener() {
