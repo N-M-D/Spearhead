@@ -1,16 +1,21 @@
 package com.example.spearhead;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-
+import androidx.appcompat.widget.AppCompatEditText;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link TimerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
@@ -19,6 +24,15 @@ public class HomeFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private boolean change;
+
+    public boolean isChange() {
+        return change;
+    }
+
+    public void setChange(boolean change) {
+        this.change = change;
+    }
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -34,7 +48,7 @@ public class HomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
+     * @return A new instance of fragment TimerFragment.
      */
     // TODO: Rename and change types and number of parameters
     public static HomeFragment newInstance(String param1, String param2) {
@@ -48,13 +62,24 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        change= true;
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        getActivity().setTitle("Spearhead");
+        getActivity().setTitle("Home");
     }
+
+    //TODO idk if this is necessary or not, but for now
+    //TODO whenever I uncomment it, it breaks the navigation
+    /*@Override
+    public void onStart() {
+        super.onStart();
+        Intent i;
+        i = new Intent(getActivity(), HomeRecyclerViewActivity.class);
+        startActivity(i);
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
